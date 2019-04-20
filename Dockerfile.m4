@@ -50,6 +50,10 @@ RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}
 m4_ifdef([[CROSS_ARCH]], [[FROM CROSS_ARCH/ubuntu:18.04]], [[FROM ubuntu:18.04]]) AS watchtower
 m4_ifdef([[CROSS_QEMU]], [[COPY --from=qemu-user-static CROSS_QEMU CROSS_QEMU]])
 
+# Environment
+ENV WATCHTOWER_TIMEOUT=30s
+ENV WATCHTOWER_CLEANUP=true
+
 # The Watchtower container is identified by the presence of this label
 LABEL com.centurylinklabs.watchtower=true
 
