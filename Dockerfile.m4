@@ -1,22 +1,11 @@
 m4_changequote([[, ]])
 
-m4_ifdef([[CROSS_QEMU]], [[
-##################################################
-## "qemu-user-static" stage
-##################################################
-
-FROM ubuntu:18.04 AS qemu-user-static
-RUN export DEBIAN_FRONTEND=noninteractive \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends qemu-user-static
-]])
-
 ##################################################
 ## "build-watchtower" stage
 ##################################################
 
 FROM golang:1-stretch AS build-watchtower
-m4_ifdef([[CROSS_QEMU]], [[COPY --from=qemu-user-static CROSS_QEMU CROSS_QEMU]])
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Environment
 ENV GO111MODULE=on
@@ -48,7 +37,7 @@ RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}
 ##################################################
 
 m4_ifdef([[CROSS_ARCH]], [[FROM CROSS_ARCH/ubuntu:18.04]], [[FROM ubuntu:18.04]]) AS watchtower
-m4_ifdef([[CROSS_QEMU]], [[COPY --from=qemu-user-static CROSS_QEMU CROSS_QEMU]])
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Environment
 ENV WATCHTOWER_TIMEOUT=30s
