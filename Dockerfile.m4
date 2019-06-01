@@ -4,8 +4,8 @@ m4_changequote([[, ]])
 ## "build-watchtower" stage
 ##################################################
 
-FROM golang:1-stretch AS build-watchtower
-m4_ifdef([[CROSS_QEMU]], [[COPY --from=hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
+FROM docker.io/golang:1-stretch AS build-watchtower
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Environment
 ENV GO111MODULE=on
@@ -36,8 +36,8 @@ RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}
 ## "watchtower" stage
 ##################################################
 
-m4_ifdef([[CROSS_ARCH]], [[FROM CROSS_ARCH/ubuntu:18.04]], [[FROM ubuntu:18.04]]) AS watchtower
-m4_ifdef([[CROSS_QEMU]], [[COPY --from=hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
+m4_ifdef([[CROSS_ARCH]], [[FROM docker.io/CROSS_ARCH/ubuntu:18.04]], [[FROM docker.io/ubuntu:18.04]]) AS watchtower
+m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Environment
 ENV WATCHTOWER_TIMEOUT=30s
