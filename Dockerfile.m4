@@ -20,7 +20,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v0.3.5
+ARG WATCHTOWER_TREEISH=v0.3.6
 RUN go get -v -d "github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}"
 RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}" \
 	&& export GOOS=m4_ifdef([[CROSS_GOOS]], [[CROSS_GOOS]]) \
@@ -30,7 +30,7 @@ RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}
 	&& go build -o ./watchtower -ldflags "${LDFLAGS}" ./main.go \
 	&& mv ./watchtower /usr/bin/watchtower \
 	&& file /usr/bin/watchtower \
-	&& /usr/bin/watchtower --version
+	&& /usr/bin/watchtower --help
 
 ##################################################
 ## "watchtower" stage
