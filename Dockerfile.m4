@@ -20,7 +20,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v0.3.6
+ARG WATCHTOWER_TREEISH=v0.3.8
 RUN go get -v -d "github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}"
 RUN cd "${GOPATH}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH}" \
 	&& export GOOS=m4_ifdef([[CROSS_GOOS]], [[CROSS_GOOS]]) \
