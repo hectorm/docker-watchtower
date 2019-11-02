@@ -1,10 +1,10 @@
 m4_changequote([[, ]])
 
 ##################################################
-## "build-watchtower" stage
+## "build" stage
 ##################################################
 
-FROM docker.io/golang:1-stretch AS build-watchtower
+FROM docker.io/golang:1-stretch AS build
 m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static:latest CROSS_QEMU CROSS_QEMU]])
 
 # Environment
@@ -16,8 +16,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		file \
-		tzdata \
-	&& rm -rf /var/lib/apt/lists/*
+		tzdata
 
 # Build Watchtower
 ARG WATCHTOWER_TREEISH=v0.3.9
@@ -60,6 +59,6 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ:?}" /etc/localtime
 RUN printf '%s\n' "${TZ:?}" > /etc/timezone
 
 # Copy Watchtower build
-COPY --from=build-watchtower --chown=root:root /usr/bin/watchtower /usr/bin/watchtower
+COPY --from=build --chown=root:root /usr/bin/watchtower /usr/bin/watchtower
 
 ENTRYPOINT ["/usr/bin/watchtower"]
