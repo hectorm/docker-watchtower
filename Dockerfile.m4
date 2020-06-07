@@ -19,7 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		tzdata
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v1.0.0
+ARG WATCHTOWER_TREEISH=v1.0.2
 RUN go get -v -d "github.com/containrrr/watchtower@${WATCHTOWER_TREEISH:?}"
 RUN cd "${GOPATH:?}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH:?}" \
 	&& export GOOS=m4_ifdef([[CROSS_GOOS]], [[CROSS_GOOS]]) \
@@ -55,8 +55,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 # Setup timezone
 ENV TZ=UTC
-RUN ln -snf "/usr/share/zoneinfo/${TZ:?}" /etc/localtime
-RUN printf '%s\n' "${TZ:?}" > /etc/timezone
+RUN printf '%s\n' "${TZ:?}" > /etc/timezone \
+	&& ln -snf "/usr/share/zoneinfo/${TZ:?}" /etc/localtime
 
 # Copy Watchtower build
 COPY --from=build --chown=root:root /usr/bin/watchtower /usr/bin/watchtower
