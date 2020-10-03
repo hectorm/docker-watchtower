@@ -10,6 +10,9 @@ m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static
 # Environment
 ENV GO111MODULE=on
 ENV CGO_ENABLED=0
+ENV GOOS=m4_ifdef([[CROSS_GOOS]], [[CROSS_GOOS]])
+ENV GOARCH=m4_ifdef([[CROSS_GOARCH]], [[CROSS_GOARCH]])
+ENV GOARM=m4_ifdef([[CROSS_GOARM]], [[CROSS_GOARM]])
 
 # Install system packages
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -19,17 +22,16 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		tzdata
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v1.0.2
-RUN go get -v -d "github.com/containrrr/watchtower@${WATCHTOWER_TREEISH:?}"
-RUN cd "${GOPATH:?}/pkg/mod/github.com/containrrr/watchtower@${WATCHTOWER_TREEISH:?}" \
-	&& export GOOS=m4_ifdef([[CROSS_GOOS]], [[CROSS_GOOS]]) \
-	&& export GOARCH=m4_ifdef([[CROSS_GOARCH]], [[CROSS_GOARCH]]) \
-	&& export GOARM=m4_ifdef([[CROSS_GOARM]], [[CROSS_GOARM]]) \
-	&& export LDFLAGS="-s -w -X main.version=${WATCHTOWER_TREEISH:?}" \
-	&& go build -o ./watchtower -ldflags "${LDFLAGS:?}" ./main.go \
-	&& mv ./watchtower /usr/bin/watchtower \
-	&& file /usr/bin/watchtower \
-	&& /usr/bin/watchtower --help
+ARG WATCHTOWER_TREEISH=v1.0.3
+ARG WATCHTOWER_REMOTE=https://github.com/containrrr/watchtower.git
+WORKDIR /go/src/watchtower/
+RUN git clone "${WATCHTOWER_REMOTE:?}" ./
+RUN git checkout "${WATCHTOWER_TREEISH:?}"
+RUN git submodule update --init --recursive
+RUN go build -o ./watchtower -ldflags "-s -w -X main.version=${WATCHTOWER_TREEISH:?}" ./main.go
+RUN mv ./watchtower /usr/bin/watchtower
+RUN file /usr/bin/watchtower
+RUN /usr/bin/watchtower --help
 
 ##################################################
 ## "watchtower" stage
@@ -41,6 +43,7 @@ m4_ifdef([[CROSS_QEMU]], [[COPY --from=docker.io/hectormolinero/qemu-user-static
 # Environment
 ENV WATCHTOWER_TIMEOUT=30s
 ENV WATCHTOWER_CLEANUP=true
+ENV WATCHTOWER_ROLLING_RESTART=true
 
 # The Watchtower container is identified by the presence of this label
 LABEL com.centurylinklabs.watchtower=true
