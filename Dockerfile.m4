@@ -22,7 +22,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 		tzdata
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v1.1.6
+ARG WATCHTOWER_TREEISH=v1.3.0
 ARG WATCHTOWER_REMOTE=https://github.com/containrrr/watchtower.git
 WORKDIR /go/src/watchtower/
 RUN git clone "${WATCHTOWER_REMOTE:?}" ./
