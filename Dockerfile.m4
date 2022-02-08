@@ -19,7 +19,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		file \
-		tzdata
+		tzdata \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Build Watchtower
 ARG WATCHTOWER_TREEISH=v1.4.0
