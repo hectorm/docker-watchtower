@@ -23,7 +23,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v1.6.0
+ARG WATCHTOWER_TREEISH=v1.7.1
 ARG WATCHTOWER_REMOTE=https://github.com/containrrr/watchtower.git
 WORKDIR /go/src/watchtower/
 RUN git clone "${WATCHTOWER_REMOTE:?}" ./
