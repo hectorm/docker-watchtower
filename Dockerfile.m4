@@ -4,7 +4,7 @@ m4_changequote([[, ]])
 ## "build" stage
 ##################################################
 
-FROM --platform=${BUILDPLATFORM} docker.io/golang:1-bookworm AS build
+FROM --platform=${BUILDPLATFORM} docker.io/golang:1-trixie AS build
 
 # Environment
 ENV GO111MODULE=on
@@ -22,13 +22,13 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Build Watchtower
-ARG WATCHTOWER_TREEISH=v1.7.1
-ARG WATCHTOWER_REMOTE=https://github.com/containrrr/watchtower.git
+ARG WATCHTOWER_TREEISH=v1.12.1
+ARG WATCHTOWER_REMOTE=https://github.com/nicholas-fedor/watchtower.git
 WORKDIR /go/src/watchtower/
 RUN git clone "${WATCHTOWER_REMOTE:?}" ./
 RUN git checkout "${WATCHTOWER_TREEISH:?}"
 RUN git submodule update --init --recursive
-RUN go build -o ./watchtower -ldflags "-s -w -X main.version=${WATCHTOWER_TREEISH:?}" ./main.go
+RUN go build -o ./watchtower -ldflags "-s -w -X github.com/nicholas-fedor/watchtower/internal/meta.Version=${WATCHTOWER_TREEISH:?}" ./main.go
 RUN mv ./watchtower /usr/bin/watchtower
 RUN file /usr/bin/watchtower
 RUN /usr/bin/watchtower --help
